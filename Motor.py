@@ -1,61 +1,77 @@
 import time
-import machine as Pin
+import RPi.GPIO as GPIO
 
-# Define the GPIO pins for the motor driver
-in1 = Pin.Pin(24, Pin.OUT)
-in2 = Pin.Pin(23, Pin.OUT)
-in3 = Pin.Pin(22, Pin.OUT)
-in4 = Pin.Pin(27, Pin.OUT)
+# Khai báo chân theo số BCM
+IN1 = 24
+IN2 = 23
+IN3 = 22
+IN4 = 27
 
-# Motor control functions
+def setup():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    for pin in (IN1, IN2, IN3, IN4):
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, GPIO.LOW)
+
 def forward():
-    in1.on()
-    in2.off()
-    in3.on()
-    in4.off()
+    GPIO.output(IN1, GPIO.HIGH)
+    GPIO.output(IN2, GPIO.LOW)
+    GPIO.output(IN3, GPIO.HIGH)
+    GPIO.output(IN4, GPIO.LOW)
 
 def backward():
-    in1.off()
-    in2.on()
-    in3.off()
-    in4.on()
+    GPIO.output(IN1, GPIO.LOW)
+    GPIO.output(IN2, GPIO.HIGH)
+    GPIO.output(IN3, GPIO.LOW)
+    GPIO.output(IN4, GPIO.HIGH)
 
 def left():
-    in1.on()
-    in2.off()
-    in3.off()
-    in4.on()
+    GPIO.output(IN1, GPIO.HIGH)
+    GPIO.output(IN2, GPIO.LOW)
+    GPIO.output(IN3, GPIO.LOW)
+    GPIO.output(IN4, GPIO.HIGH)
 
 def right():
-    in1.off()
-    in2.on()
-    in3.on()
-    in4.off()
+    GPIO.output(IN1, GPIO.LOW)
+    GPIO.output(IN2, GPIO.HIGH)
+    GPIO.output(IN3, GPIO.HIGH)
+    GPIO.output(IN4, GPIO.LOW)
 
 def stop():
-    in1.off()
-    in2.off()
-    in3.off()
-    in4.off()
+    for pin in (IN1, IN2, IN3, IN4):
+        GPIO.output(pin, GPIO.LOW)
 
-while True:
-    forward()
-    time.sleep(2)
+def cleanup():
     stop()
-    time.sleep(1)
+    GPIO.cleanup()
 
-    backward()
-    time.sleep(2)
-    stop()
-    time.sleep(1)
+if __name__ == "__main__":
+    try:
+        setup()
+        while True:
+            forward()
+            time.sleep(2)
+            stop()
+            time.sleep(1)
 
-    left()
-    time.sleep(2)
-    stop()
-    time.sleep(1)
+            backward()
+            time.sleep(2)
+            stop()
+            time.sleep(1)
 
-    right()
-    time.sleep(2)
-    stop()
-    time.sleep(1)
-  
+            left()
+            time.sleep(2)
+            stop()
+            time.sleep(1)
+
+            right()
+            time.sleep(2)
+            stop()
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        cleanup()
+        print("GPIO cleaned up.")
