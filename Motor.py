@@ -52,23 +52,7 @@ if __name__ == "__main__":
         while True:
             forward()
             time.sleep(2)
-            stop()
-            time.sleep(1)
 
-            backward()
-            time.sleep(2)
-            stop()
-            time.sleep(1)
-
-            left()
-            time.sleep(2)
-            stop()
-            time.sleep(1)
-
-            right()
-            time.sleep(2)
-            stop()
-            time.sleep(1)
 
     except KeyboardInterrupt:
         pass
