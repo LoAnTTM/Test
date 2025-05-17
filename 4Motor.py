@@ -1,32 +1,28 @@
+#!/usr/bin/env python3
 import spidev
 import RPi.GPIO as GPIO
 import time
 
-# --- Cấu hình GPIO và PWM ---
+# --- Thiết lập GPIO/SPI ---
 GPIO.setmode(GPIO.BCM)
-pwm_pins = {
-    1: 18,  # EN1 → PWM0
-    2: 19,  # EN2 → PWM1
-    3: 13,  # EN3 → PWM1
-    4: 12,  # EN4 → PWM0
-}
-pwms = {}
-for motor, pin in pwm_pins.items():
-    GPIO.setup(pin, GPIO.OUT)
-    pwms[motor] = GPIO.PWM(pin, 1000)  # tần số 1 kHz
-    pwms[motor].start(0)                # duty cycle ban đầu = 0%
+GPIO.setwarnings(False)
+# Hủy mọi pin cũ (nếu có)
+GPIO.cleanup()
 
-# --- Cấu hình SPI (bus 0, device 0) ---
+# PWM pins cho M1–M4
+pwm_pins = {1: 18, 2: 19, 3: 13, 4: 12}
+pwms = {}
+for m, pin in pwm_pins.items():
+    GPIO.setup(pin, GPIO.OUT)
+    pwms[m] = GPIO.PWM(pin, 1000)  # 1 kHz
+    pwms[m].start(0)
+
+# Mở bus SPI0, device CE0
 spi = spidev.SpiDev()
 spi.open(0, 0)
-spi.max_speed_hz = 50000  # hoặc up to 1 MHz tùy shield
+spi.max_speed_hz = 50000
 
-# --- Bảng mapping chiều quay ---
-# Giả sử shift register xuất bit như sau:
-#   bit 0/1 → Input1/Input2 của M1
-#   bit 2/3 → Input1/Input2 của M2
-#   bit 4/5 → Input1/Input2 của M3
-#   bit 6/7 → Input1/Input2 của M4
+# Map bit shift register cho chiều
 dir_bits = {
     1: (0, 1),
     2: (2, 3),
@@ -34,53 +30,55 @@ dir_bits = {
     4: (6, 7),
 }
 
-def set_motor(motor, speed, forward=True):
-    """
-    motor: 1..4
-    speed: 0..100
-    forward: True = tiến, False = lùi
-    """
-    in1, in2 = dir_bits[motor]
-    # tạo byte điều khiển chiều: chỉ 1 bit HIGH, bit còn lại LOW
+# --- Hàm điều khiển ---
+def set_motor(m, speed, forward=True):
+    # Chuyển đổi tốc độ từ 0-100% sang 0-255
+    speed = int(speed * 2.55)
     if forward:
-        byte = (1 << in1)
+        GPIO.output(dir_bits[m][0], GPIO.HIGH)
+        GPIO.output(dir_bits[m][1], GPIO.LOW)
     else:
-        byte = (1 << in2)
-    # gửi lên shift register và tự động latch via CS0
-    spi.xfer([byte])
-    # chỉnh tốc độ PWM
-    pwms[motor].ChangeDutyCycle(speed)
+        GPIO.output(dir_bits[m][0], GPIO.LOW)
+        GPIO.output(dir_bits[m][1], GPIO.HIGH)
+    pwms[m].ChangeDutyCycle(speed)
+    print(f"Motor {m} {'forward' if forward else 'backward'} at {speed}%")
+def stop_motor(m):
+    pwms[m].ChangeDutyCycle(0)
+    GPIO.output(dir_bits[m][0], GPIO.LOW)
+    GPIO.output(dir_bits[m][1], GPIO.LOW)
+    print(f"Motor {m} stopped")
 
+def forward():
+    for m in pwm_pins:
+        set_motor(m, 50, forward=True)
+    print("Moving forward...")
+    time.sleep(2)
 
-def stop_motor(motor):
-    """Dừng motor: duty cycle = 0 và clear hướng."""
-    pwms[motor].ChangeDutyCycle(0)
-    spi.xfer([0x00])
+def backward():
+    for m in pwm_pins:
+        set_motor(m, 50, forward=False)
+    print("Moving backward...")
+    time.sleep(2)
 
+def cleanup():
+    for p in pwms.values():
+        p.stop()
+    GPIO.cleanup()
+    print("GPIO cleaned up.")
 
-# --- Ví dụ chạy thử ---
+# --- Thí dụ chạy thử ---
 try:
-    # Chạy tiến 50% trong 2s
-    for m in range(1, 5):
-        set_motor(m, speed=50, forward=True)
-    time.sleep(2)
-
-    # Chạy lùi 50% trong 2s
-    for m in range(1, 5):
-        set_motor(m, speed=50, forward=False)
-    time.sleep(2)
-
-    # Dừng hết
-    for m in range(1, 5):
-        stop_motor(m)
+    forward()
+    time.sleep(1)
+    backward()
     time.sleep(1)
 
+
 except KeyboardInterrupt:
-    pass
+    print("Program interrupted by user.")
 
 finally:
-    # Giải phóng tài nguyên
     spi.close()
-    for m in pwms.values():
-        m.stop()
-    GPIO.cleanup()
+    for p in pwms.values():
+        p.stop()
+    cleanup()
