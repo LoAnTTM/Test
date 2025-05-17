@@ -81,11 +81,10 @@ def cleanup():
 
 if __name__ == "__main__":
     try:
-        forward(duration=2, speed=60)
-        backward(duration=2, speed=60)
-        # dừng sau cùng
-        for m in pwm_pins:
-            stop_motor(m)
+        while True:
+            forward(duration=2, speed=60)
+            backward(duration=2, speed=60)
+        
     except KeyboardInterrupt:
         print("Interrupted by user.")
     finally:
