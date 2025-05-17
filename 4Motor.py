@@ -60,20 +60,24 @@ def set_motor(motor, speed, forward=True):
     byte = (1 << in1) if forward else (1 << in2)
     shift_byte(byte)
     pwms[motor].ChangeDutyCycle(speed)
+    print(f"Motor {motor} {'forward' if forward else 'backward'} at {speed}%")
 
 def stop_motor(motor):
     pwms[motor].ChangeDutyCycle(0)
     shift_byte(0x00)
+    print(f"Motor {motor} stopped")
 
 def forward(duration=2, speed=50):
     for m in PWM_PINS:
         set_motor(m, speed, forward=True)
     time.sleep(duration)
+    print("Moving forward...")
 
 def backward(duration=2, speed=50):
     for m in PWM_PINS:
         set_motor(m, speed, forward=False)
     time.sleep(duration)
+    print("Moving backward...")
 
 def cleanup():
     for p in pwms.values():
