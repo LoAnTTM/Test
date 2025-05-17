@@ -49,12 +49,29 @@ def cleanup():
 if __name__ == "__main__":
     try:
         setup()
+        # while True:
+        #     forward()
+        #     time.sleep(2)
+
+        #control with keyboard up and down arrow long with press
         while True:
-            forward()
-            time.sleep(2)
-
-
-    except KeyboardInterrupt:
+            command = input("Enter command (w/a/s/d to move, q to quit): ").strip().lower()
+            if command == 'w':
+                forward()
+            elif command == 's':
+                backward()
+            elif command == 'a':
+                left()
+            elif command == 'd':
+                right()
+            elif command == 'q':
+                break
+            else:
+                print("Invalid command. Use w/a/s/d to move, q to quit.")
+            time.sleep(0.1)
+            
+    except Exception as e:
+        print(f"An error occurred: {e}")
         pass
     finally:
         cleanup()
