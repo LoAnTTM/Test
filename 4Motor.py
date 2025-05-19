@@ -27,18 +27,17 @@ def stop_all():
     shift_register.latch()
 
 if __name__ == "__main__":
-    try:
-        
+    try: 
         while True:
-            match input():
-                case 'w':
-                    print("Run forward all motors for 5 seconds.")
-                    forward_all(5)
-                case 'q':
-                    print("Stop all motors.")
-                    stop_all()
-                    break
-
+            inp = input()
+            if inp == 'w':
+                print("Run forward all motors for 5 seconds.")
+                forward_all(5)
+            elif inp == 'q':
+                print("Stop all motors.")
+                stop_all()
+            else:
+                print("Invalid command. Use w to move forward, q to quit.")
     except KeyboardInterrupt:
         pass
     finally:
