@@ -28,7 +28,7 @@ def stop_all():
 
 if __name__ == "__main__":
     try:
-        while True:
+        while input()== 'w':
             print("Run forward all motors for 5 seconds.")
             forward_all(5)
             print("Stop all motors for 5 seconds.")
