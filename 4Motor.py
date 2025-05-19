@@ -75,7 +75,7 @@ if __name__ == "__main__":
             inp = input("> ").strip().lower()
             if inp == 'w':
                 logger.info("→ Forward all motors for 5s")
-                forward_all(5)
+                forward_all()
             elif inp == 's':
                 logger.info("→ Stop all motors")
                 stop_all()
