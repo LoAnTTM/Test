@@ -33,9 +33,11 @@ if __name__ == "__main__":
             if inp == 'w':
                 print("Run forward all motors for 5 seconds.")
                 forward_all(5)
-            elif inp == 'q':
+            elif inp == 's':
                 print("Stop all motors.")
                 stop_all()
+            elif inp == 'q':
+                print("Quit.")
                 break
             else:
                 print("Invalid command. Use w to move forward, q to quit.")
