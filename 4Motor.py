@@ -36,6 +36,7 @@ if __name__ == "__main__":
             elif inp == 'q':
                 print("Stop all motors.")
                 stop_all()
+                break
             else:
                 print("Invalid command. Use w to move forward, q to quit.")
     except KeyboardInterrupt:
