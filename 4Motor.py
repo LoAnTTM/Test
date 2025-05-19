@@ -46,7 +46,7 @@ def forward_all(duration=2):
     log_sr_outputs(outputs)
     log_gpio_states()
     sleep(duration)
-    stop_all()
+    # stop_all()
 
 def stop_all():
     outputs = [GPIO.LOW] * 8
