@@ -28,12 +28,17 @@ def stop_all():
 
 if __name__ == "__main__":
     try:
-        while input()== 'w':
-            print("Run forward all motors for 5 seconds.")
-            forward_all(5)
-            print("Stop all motors for 5 seconds.")
-            stop_all()
-            sleep(5)
+        
+        while True:
+            match input():
+                case 'w':
+                    print("Run forward all motors for 5 seconds.")
+                    forward_all(5)
+                case 'q':
+                    print("Stop all motors.")
+                    stop_all()
+                    break
+
     except KeyboardInterrupt:
         pass
     finally:
