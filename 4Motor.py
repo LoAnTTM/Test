@@ -46,3 +46,5 @@ if __name__ == "__main__":
         pass
     finally:
         GPIO.cleanup()
+        print("GPIO cleaned up.")
+

@@ -8,7 +8,7 @@ class ShiftRegister:
     latch_pin => pin 12 on the 74HC595
     clock_pin => pin 11 on the 74HC595
     """
-    def __init__(self, data_pin, latch_pin, clock_pin):
+    def __init__(self, data_pin: int, latch_pin: int, clock_pin: int) -> None:
         self.data_pin = data_pin
         self.latch_pin = latch_pin
         self.clock_pin = clock_pin
