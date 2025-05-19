@@ -20,9 +20,9 @@ LATCH_PIN = 8
 
 # For translating BCM → physical header and name
 PIN_INFO = {
-    DATA_PIN:  {"name": "DATA_PIN",  "phys": 19, "func": "SPI0_MOSI"},
-    CLOCK_PIN: {"name": "CLOCK_PIN", "phys": 23, "func": "SPI0_SCLK"},
-    LATCH_PIN: {"name": "LATCH_PIN", "phys": 24, "func": "SPI0_CE0_N"},
+    DATA_PIN:  {"name": "DATA_PIN", "func": "SPI0_MOSI"},
+    CLOCK_PIN: {"name": "CLOCK_PIN", "func": "SPI0_SCLK"},
+    LATCH_PIN: {"name": "LATCH_PIN", "func": "SPI0_CE0_N"},
 }
 
 shift_register = ShiftRegister(DATA_PIN, LATCH_PIN, CLOCK_PIN)
@@ -49,11 +49,8 @@ def log_gpio_states():
     for pin in PIN_INFO:
         log_pin_details(pin)
 
-def log_sr_outputs(outputs):
-    states = ['H' if o == GPIO.HIGH else 'L' for o in outputs]
-    logger.info(f"Shift‐register Q0–Q7 outputs: {states}")
 
-def forward_all(duration=2):
+def forward_all():
     outputs = [
         GPIO.HIGH, GPIO.LOW,   # Motor 1
         GPIO.HIGH, GPIO.LOW,   # Motor 2
@@ -62,19 +59,13 @@ def forward_all(duration=2):
     ]
     shift_register.setOutputs(outputs)
     shift_register.latch()
-
-    log_sr_outputs(outputs)
     log_gpio_states()
-
-    sleep(duration)
-    stop_all()
 
 def stop_all():
     outputs = [GPIO.LOW] * 8
     shift_register.setOutputs(outputs)
     shift_register.latch()
 
-    log_sr_outputs(outputs)
     log_gpio_states()
 
 if __name__ == "__main__":
