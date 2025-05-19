@@ -21,6 +21,7 @@ def forward_all(duration=2):
     shift_register.setOutputs(outputs)
     shift_register.latch()
     sleep(duration)
+    stop_all()
 
 def stop_all():
     shift_register.setOutputs([GPIO.LOW]*8)
