@@ -28,10 +28,12 @@ def stop_all():
 
 if __name__ == "__main__":
     try:
-        print("Run forward all motors for 3 seconds.")
-        forward_all(3)
-        print("Stop all motor.")
-        stop_all()
+        while True:
+            print("Run forward all motors for 5 seconds.")
+            forward_all(5)
+            print("Stop all motors for 5 seconds.")
+            stop_all()
+            sleep(5)
     except KeyboardInterrupt:
         pass
     finally:
