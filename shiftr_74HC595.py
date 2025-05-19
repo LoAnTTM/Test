@@ -38,13 +38,13 @@ class ShiftRegister:
         except IndexError:
             raise ValueError("Invalid output number. Can be only an int from 0 to 7")
 
-    def setOutputs(self, outputs):
+    def setOutputs(self, outputs: list[int]) -> None:
         if 8 != len(outputs):
             raise ValueError("setOutputs must be an array with 8 elements")
 
         self.outputs = outputs
 
-    def latch(self):
+    def latch(self) -> None:
         GPIO.output(self.latch_pin, GPIO.LOW)
 
         for i in range(7, -1, -1):

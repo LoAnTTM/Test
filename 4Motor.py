@@ -9,7 +9,7 @@ DATA_PIN  = 10
 CLOCK_PIN = 11   
 LATCH_PIN = 8    
 
-shift_register = ShiftRegister(DATA_PIN, CLOCK_PIN, LATCH_PIN)
+shift_register = ShiftRegister(DATA_PIN, LATCH_PIN, CLOCK_PIN)
 
 def forward_all(duration=2):
     outputs = [
