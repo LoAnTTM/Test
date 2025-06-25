@@ -1,44 +1,59 @@
-import RPi.GPIO as GPIO
+import Jetson.GPIO as GPIO
 import time
 
-# for 1st Motor on ENA
-ENA = 32
-IN1 = 11
-IN2 = 13
+# Physical board pin numbers
+ENA = 32   # PWM0 (GPIO12)
+IN1 = 11   # GPIO17
+IN2 = 13   # GPIO27
 
-# set pin numbers to the board's
+# Setup
 GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
 
-# initialize EnA, In1 and In2
-GPIO.setup(ENA, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(IN1, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(IN2, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(ENA, GPIO.OUT)
+GPIO.setup(IN1, GPIO.OUT)
+GPIO.setup(IN2, GPIO.OUT)
 
-# Stop
-GPIO.output(ENA, GPIO.HIGH)
-GPIO.output(IN1, GPIO.LOW)
-GPIO.output(IN2, GPIO.LOW)
-time.sleep(1)
+# Create PWM instance on ENA at 1kHz
+pwm = GPIO.PWM(ENA, 1000)
+pwm.start(0)  # Start with 0% duty
 
-# Forward
-GPIO.output(IN1, GPIO.HIGH)
-GPIO.output(IN2, GPIO.LOW)
-time.sleep(1)
+try:
+    # Initial stop
+    GPIO.output(IN1, GPIO.LOW)
+    GPIO.output(IN2, GPIO.LOW)
+    pwm.ChangeDutyCycle(0)
+    time.sleep(1)
 
-# Stop
-GPIO.output(IN1, GPIO.LOW)
-GPIO.output(IN2, GPIO.LOW)
-time.sleep(1)
+    # Forward at 70% speed
+    print("Forward at 70% speed")
+    GPIO.output(IN1, GPIO.HIGH)
+    GPIO.output(IN2, GPIO.LOW)
+    pwm.ChangeDutyCycle(70)
+    time.sleep(2)
 
-# Backward
-GPIO.output(IN1, GPIO.LOW)
-GPIO.output(IN2, GPIO.HIGH)
-time.sleep(1)
+    # Stop
+    print("Stop")
+    GPIO.output(IN1, GPIO.LOW)
+    GPIO.output(IN2, GPIO.LOW)
+    pwm.ChangeDutyCycle(0)
+    time.sleep(1)
 
-# Stop
-GPIO.output(ENA, GPIO.LOW)
-GPIO.output(IN1, GPIO.LOW)
-GPIO.output(IN2, GPIO.LOW)
-time.sleep(1)
+    # Backward at 50% speed
+    print("Backward at 50% speed")
+    GPIO.output(IN1, GPIO.LOW)
+    GPIO.output(IN2, GPIO.HIGH)
+    pwm.ChangeDutyCycle(50)
+    time.sleep(2)
 
-GPIO.cleanup()
+    # Final stop
+    print("Final stop")
+    GPIO.output(IN1, GPIO.LOW)
+    GPIO.output(IN2, GPIO.LOW)
+    pwm.ChangeDutyCycle(0)
+    time.sleep(1)
+
+finally:
+    pwm.stop()
+    GPIO.cleanup()
+    print("✅ PWM stopped and GPIO cleaned up.")
