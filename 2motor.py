@@ -7,11 +7,11 @@ import tty
 # GPIO pin setup
 IN1 = 11  
 IN2 = 13  
-ENA = 32  
+ENA = 15  
 
 IN3 = 16  
 IN4 = 18  
-ENB = 33  
+ENB = 22  
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(IN1, GPIO.OUT)
