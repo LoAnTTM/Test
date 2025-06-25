@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # for 1st Motor on ENA
-ENA = 33
+ENA = 32
 IN1 = 11
 IN2 = 13
 
