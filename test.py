@@ -1,5 +1,5 @@
 import time
-import RPi.GPIO as GPIO
+import Jetson.GPIO as GPIO
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 class Robot():
