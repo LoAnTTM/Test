@@ -7,8 +7,8 @@ GPIO.setmode(GPIO.BOARD)
 
 class Robot:
     def __init__(self):
-        self.left_motor = [35, 36]
-        self.right_motor = [37, 38]
+        self.left_motor = [11, 13]
+        self.right_motor = [16, 18]
         self.left_speed = 0
         self.right_speed = 0
 
