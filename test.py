@@ -1,60 +1,104 @@
-import RPi.GPIO as GPIO
 import time
-
-# Setup pin numbers
-ENA = 32   # Enable pin with PWM (Pin 32 = GPIO12)
-IN1 = 11   # Direction
-IN2 = 13
-
-# Use physical pin numbering
-GPIO.setmode(GPIO.BOARD)
+import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+class Robot():
+ def __init__(self, *args, **kwargs):
+  super(Robot, self).__init__(*args, **kwargs)
+  self.left_motor = [35,36]
+  self.right_motor = [37,38]
+  self.left_speed = 0
+  self.right_speed = 0
+  GPIO.setup(32,GPIO.OUT)
+  GPIO.setup(33,GPIO.OUT) 
+  self.pwm=[GPIO.PWM(32,50),GPIO.PWM(33,50)]
+  GPIO.setup(self.left_motor[0],GPIO.OUT,initial=GPIO.LOW)
+  GPIO.setup(self.right_motor[0],GPIO.OUT,initial=GPIO.LOW) 
+  GPIO.setup(self.left_motor[1],GPIO.OUT,initial=GPIO.LOW)
+  GPIO.setup(self.right_motor[1],GPIO.OUT,initial=GPIO.LOW) 
+  self.pwm[0].start(0)
+  self.pwm[1].start(0)
+def set_motors(self, left_speed=1.0, right_speed=1.0):
+  GPIO.output(self.left_motor[0],GPIO.HIGH)
+  GPIO.output(self.right_motor[0],GPIO.HIGH) 
+  self.left_speed = ((left_speed - (-1))/2)*100
+  self.right_speed = ((right_speed - (-1))/2)*100
+  print()
+  print()
+  self.pwm[0].ChangeDutyCycle(self.left_speed)
+  self.pwm[1].ChangeDutyCycle(self.right_speed)
+    
+ def forward(self, speed=1.0, duration=None):
+  GPIO.output(self.left_motor[0],GPIO.HIGH)
+  GPIO.output(self.right_motor[0],GPIO.HIGH) 
+  GPIO.output(self.left_motor[1],GPIO.LOW)
+  GPIO.output(self.right_motor[1],GPIO.LOW) 
+  self.speed = ((speed - (-1))/2)*100
+  self.pwm[0].ChangeDutyCycle(self.speed)
+  self.pwm[1].ChangeDutyCycle(self.speed)
+def backward(self, speed=1.0):
+  GPIO.output(self.left_motor[0],GPIO.LOW)
+  GPIO.output(self.right_motor[0],GPIO.LOW) 
+  GPIO.output(self.left_motor[1],GPIO.HIGH)
+  GPIO.output(self.right_motor[1],GPIO.HIGH) 
+  self.speed = ((speed - (-1))/2)*100
+  self.pwm[0].ChangeDutyCycle(self.speed)
+  self.pwm[1].ChangeDutyCycle(self.speed)
+def left(self, speed=1.0):
+  GPIO.output(self.left_motor[0],GPIO.LOW)
+  GPIO.output(self.right_motor[0],GPIO.HIGH) 
+  GPIO.output(self.left_motor[1],GPIO.HIGH)
+  GPIO.output(self.right_motor[1],GPIO.LOW) 
+  self.speed = ((speed - (-1))/2)*100
+  self.pwm[0].ChangeDutyCycle(self.speed)
+  self.pwm[1].ChangeDutyCycle(self.speed)
+def right(self, speed=1.0):
+  GPIO.output(self.left_motor[0],GPIO.HIGH)
+  GPIO.output(self.right_motor[0],GPIO.LOW) 
+  GPIO.output(self.left_motor[1],GPIO.LOW)
+  GPIO.output(self.right_motor[1],GPIO.HIGH) 
+  self.speed = ((speed - (-1))/2)*100
+  self.pwm[0].ChangeDutyCycle(self.speed)
+  self.pwm[1].ChangeDutyCycle(self.speed)
+def stop(self):
+  GPIO.output(self.left_motor[0],GPIO.LOW)
+  GPIO.output(self.right_motor[0],GPIO.LOW) 
+  GPIO.output(self.left_motor[1],GPIO.LOW)
+  GPIO.output(self.right_motor[1],GPIO.LOW) 
+  self.left_speed = 0
+  self.right_speed = 0
+  self.pwm[0].ChangeDutyCycle(self.left_speed)
+  self.pwm[1].ChangeDutyCycle(self.right_speed)
 
-# Set up pins
-GPIO.setup(ENA, GPIO.OUT)
-GPIO.setup(IN1, GPIO.OUT)
-GPIO.setup(IN2, GPIO.OUT)
 
-# Create PWM instance on ENA pin at 1kHz
-pwm = GPIO.PWM(ENA, 1000)
-pwm.start(0)  # Start with 0% duty cycle (stopped)
-
-try:
-    # Stop initially
-    GPIO.output(IN1, GPIO.LOW)
-    GPIO.output(IN2, GPIO.LOW)
-    pwm.ChangeDutyCycle(0)
-    time.sleep(1)
-
-    # Forward at 70% speed
-    print("Running forward at 70% speed")
-    GPIO.output(IN1, GPIO.HIGH)
-    GPIO.output(IN2, GPIO.LOW)
-    pwm.ChangeDutyCycle(70)
-    time.sleep(2)
-
-    # Stop
-    print("Stop")
-    GPIO.output(IN1, GPIO.LOW)
-    GPIO.output(IN2, GPIO.LOW)
-    pwm.ChangeDutyCycle(0)
-    time.sleep(1)
-
-    # Backward at 50% speed
-    print("Running backward at 50% speed")
-    GPIO.output(IN1, GPIO.LOW)
-    GPIO.output(IN2, GPIO.HIGH)
-    pwm.ChangeDutyCycle(50)
-    time.sleep(2)
-
-    # Final stop
-    print("Final stop")
-    GPIO.output(IN1, GPIO.LOW)
-    GPIO.output(IN2, GPIO.LOW)
-    pwm.ChangeDutyCycle(0)
-    time.sleep(1)
-
-finally:
-    pwm.stop()
+def cleanup(self):
+    self.stop()
     GPIO.cleanup()
-    print("GPIO cleaned up.")
+
+
+if __name__ == "__main__":
+    robot = Robot()
+    try:
+        print("=== Control your robot using W A S D keys (Q to quit) ===")
+        while True:
+            command = input("Enter command (w/a/s/d to move, q to quit): ").strip().lower()
+            if command == 'w':
+                robot.forward()
+            elif command == 's':
+                robot.backward()
+            elif command == 'a':
+                robot.left()
+            elif command == 'd':
+                robot.right()
+            elif command == 'q':
+                break
+            else:
+                print("Invalid command. Use w/a/s/d to move, q to quit.")
+            time.sleep(0.1)
+    finally:
+        robot.cleanup()
+        print("Cleaning up GPIO and stopping motors.")
+        GPIO.cleanup()
+        print("GPIO cleanup complete. Exiting program.")
+        robot.stop()
+        print("Motors stopped.")
