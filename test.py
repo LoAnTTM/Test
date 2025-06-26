@@ -1,6 +1,7 @@
 import time
 import Jetson.GPIO as GPIO
 
+open = __builtins__.open
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 
