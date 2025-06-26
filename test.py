@@ -28,7 +28,7 @@ def set_motors(self, left_speed=1.0, right_speed=1.0):
   self.pwm[0].ChangeDutyCycle(self.left_speed)
   self.pwm[1].ChangeDutyCycle(self.right_speed)
     
- def forward(self, speed=1.0, duration=None):
+def forward(self, speed=1.0, duration=None):
   GPIO.output(self.left_motor[0],GPIO.HIGH)
   GPIO.output(self.right_motor[0],GPIO.HIGH) 
   GPIO.output(self.left_motor[1],GPIO.LOW)
